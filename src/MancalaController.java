@@ -1,3 +1,4 @@
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 
@@ -8,7 +9,6 @@ public class MancalaController {
     private boolean freeTurn;
 
 
-
     public MancalaController(MancalaModel model, MancalaView view)
     {
         this.model = model;
@@ -16,7 +16,124 @@ public class MancalaController {
         undoCount = 0;
         freeTurn = false;
 
+
+        view.pit1.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+
+        });
+
+
+        view.pit2.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+
+        view.pit3.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+            }
+        });
+
+        view.pit4.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit5.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit6.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit7.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit8.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit9.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit10.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit11.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.pit12.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        view.undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.undo();
+                view.undoButton.setVisible(false);
+            }
+        });
+
+        view.firstStyleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BoardStyle firstStyle = new FirstStyle();
+                model.setBoardStyle(firstStyle);
+                view.setBoardStyle(firstStyle); // Update the view's boardStyle
+                view.stylePanel.setVisible(false);
+                view.boardPanel.setVisible(true);
+                view.updateBoard();
+            }
+        });
+
+        view.secondStyleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setBoardStyle(new SecondStyle());
+                view.setBoardStyle(new SecondStyle());
+                view.stylePanel.setVisible(false);
+                view.boardPanel.setVisible(true);
+                view.updateBoard();
+            }
+        });
+
     }
+
 
     /**
      * Initializes the display of the board with stores and pits.
@@ -73,9 +190,22 @@ public class MancalaController {
      * Checks the status of the game (number of stones that each
      * player has).
      */
-    public void updateView(){
 
-    }
+    /**
+     *
+     *     public void updateView(){
+     *         //checks
+     *         if(model.isPlayerA())
+     *         {
+     *
+     *         }else if (!(model.isPlayerA()))
+     *         {
+     *
+     *         }
+     *
+     *     }
+     */
+
 
 
 

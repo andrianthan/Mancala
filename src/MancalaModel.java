@@ -10,6 +10,10 @@ public class MancalaModel {
     // Stack to track undo functionality
     private Stack<GameState> history;
 
+    // Stores the style of the board
+    private BoardStyle currentStyle;
+
+
     public MancalaModel(int numStonesPerPit) {
         this.numStonesPerPit = numStonesPerPit;
         // 12 pits, 6 for each player
@@ -20,6 +24,7 @@ public class MancalaModel {
         history = new Stack<>();
         initializeBoard();
     }
+
 
     private void initializeBoard() {
         for (int i = 0; i < pits.length; i++) {
@@ -169,5 +174,11 @@ public class MancalaModel {
         public boolean isPlayerA() {
             return isPlayerA;
         }
+
+    }
+
+    public void setBoardStyle(BoardStyle boardStyle)
+    {
+        currentStyle = boardStyle;
     }
 }

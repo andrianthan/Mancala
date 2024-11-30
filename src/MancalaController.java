@@ -1,4 +1,7 @@
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 
 public class MancalaController {
@@ -7,8 +10,6 @@ public class MancalaController {
     private int undoCount;
     private boolean freeTurn;
 
-
-
     public MancalaController(MancalaModel model, MancalaView view)
     {
         this.model = model;
@@ -16,7 +17,54 @@ public class MancalaController {
         undoCount = 0;
         freeTurn = false;
 
+        view.boardPanel.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                int pitIndex = view.getClickedPit(e.getX(), e.getY());
+                if(pitIndex != -1) {
+                    try{
+                        model.moveStones(pitIndex);
+                        view.updateBoard();
+                    } catch (IllegalArgumentException ex){
+                        System.out.println(ex.getMessage());
+                    }
+                }
+            }
+        });
+
+        view.undoButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.undo();
+                view.undoButton.setVisible(true);
+            }
+        });
+
+        view.firstStyleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                BoardStyle firstStyle = new FirstStyle();
+                model.setBoardStyle(firstStyle);
+                view.setBoardStyle(firstStyle); // Update the view's boardStyle
+                view.stylePanel.setVisible(false);
+                view.boardPanel.setVisible(true);
+                view.updateBoard();
+            }
+        });
+
+        view.secondStyleButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                model.setBoardStyle(new SecondStyle());
+                view.setBoardStyle(new SecondStyle());
+                view.stylePanel.setVisible(false);
+                view.boardPanel.setVisible(true);
+                view.updateBoard();
+            }
+        });
+
     }
+
 
     /**
      * Initializes the display of the board with stores and pits.
@@ -73,9 +121,22 @@ public class MancalaController {
      * Checks the status of the game (number of stones that each
      * player has).
      */
-    public void updateView(){
 
-    }
+    /**
+     *
+     *     public void updateView(){
+     *         //checks
+     *         if(model.isPlayerA())
+     *         {
+     *
+     *         }else if (!(model.isPlayerA()))
+     *         {
+     *
+     *         }
+     *
+     *     }
+     */
+
 
 
 

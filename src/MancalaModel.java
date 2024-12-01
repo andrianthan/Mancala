@@ -7,6 +7,9 @@ public class MancalaModel {
     private int numStonesPerPit;
     // Tracks whose turn it is
     private boolean isPlayerA;
+    private int freeTurn = 0;
+
+    private int undoCount = 0;
     // Stack to track undo functionality
     private Stack<GameState> history;
 
@@ -50,6 +53,7 @@ public class MancalaModel {
 
     public void togglePlayer() {
         isPlayerA = !isPlayerA;
+        resetCounters();
     }
 
     public void saveState() {
@@ -118,6 +122,7 @@ public class MancalaModel {
 
         // If last stone lands in own Mancala, player gets another turn
         if ((isPlayerA && lastIndex == 6) || (!isPlayerA && lastIndex == 13)) {
+            freeTurn = 1;
             return; // Free turn, do not toggle player
         }
 
@@ -135,6 +140,16 @@ public class MancalaModel {
         }
 
         return playerAPitsEmpty || playerBPitsEmpty;
+    }
+
+    public boolean isFreeTurn()
+    {
+        if (freeTurn >= 1)
+        {
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public void collectRemainingStones() {
@@ -181,4 +196,15 @@ public class MancalaModel {
     {
         currentStyle = boardStyle;
     }
+
+    public int getUndoCount(){
+        return undoCount;
+    }
+
+    public void resetCounters()
+    {
+        freeTurn = 0;
+        undoCount = 3;
+    }
+
 }

@@ -16,9 +16,20 @@ public class MancalaView extends JFrame {
 
     int width = 800;
     int height = 500;
+    String message = "";
+    String freeTurn;
 
+    //number of stones in mancala A
     JLabel mancalaALabel;
+
+    //number of stones in mancala B
     JLabel mancalaBLabel;
+
+    //status message of the game
+    JLabel statusMessage;
+
+    //number of free turns left
+    JLabel freeTurnMessage;
 
     public MancalaView(MancalaModel model) {
         this.model = model;
@@ -93,14 +104,28 @@ public class MancalaView extends JFrame {
         add(boardPanel, BorderLayout.CENTER);
 
         JPanel controlPanel = new JPanel();
-        undoButton = new JButton("Undo");
+        undoButton = new JButton("Undos Left: 0");
         mancalaALabel = new JLabel(" Mancala A: 0");
         mancalaBLabel = new JLabel(" Mancala B: 0");
+        freeTurnMessage = new JLabel();
+        statusMessage = new JLabel();
+        Font font = statusMessage.getFont();
+        Font boldFont = new Font(font.getFontName(), font.BOLD, font.getSize());
+        statusMessage.setFont(boldFont);
+        statusMessage.setFont(font);
+        message= "Current Player Turn: Player A ";
+        freeTurn = "Free Turns: 0 | ";
+        setFreeTurnMessage(freeTurn);
+        setStatusMessage(message);
+        controlPanel.add(statusMessage);
+        controlPanel.add(freeTurnMessage);
         controlPanel.add(mancalaALabel);
         controlPanel.add(mancalaBLabel);
+
         controlPanel.add(undoButton);
         add(controlPanel, BorderLayout.SOUTH);
     }
+
 
     public MancalaModel getModel()
     {
@@ -119,12 +144,36 @@ public class MancalaView extends JFrame {
 
     //update board view when player makes a move
     public void updateBoard(){
-        mancalaALabel.setText("Mancala A: " + model.getMancalaA());
-        mancalaBLabel.setText("Mancala B: " + model.getMancalaB());
+        mancalaALabel.setText("Mancala A: " + model.getMancalaA() + " | ");
+        mancalaBLabel.setText("Mancala B: " + model.getMancalaB() + " | ");
+        statusMessage.setText(message + " | ");
         boardPanel.repaint();
     }
 
     public void setBoardStyle(BoardStyle boardStyle) {
         this.boardStyle = boardStyle;
+    }
+
+    public void setStatusMessage(String message)
+    {
+        this.message = message;
+        statusMessage.setText(message);
+        updateBoard();
+    }
+
+    public void setFreeTurnMessage(String message)
+    {
+        freeTurn = message;
+        freeTurnMessage.setText(freeTurn);
+        updateBoard();
+    }
+
+    public void handleGameOver() {
+        model.collectRemainingStones();
+        updateBoard();
+        int mancalaA = model.getMancalaA();
+        int mancalaB = model.getMancalaB();
+        String winner = mancalaA > mancalaB ? "A" : mancalaA < mancalaB ? "B" : "No one! It's a tie!";
+        setStatusMessage("Game Over! Player " + winner + " wins!");
     }
 }

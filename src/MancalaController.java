@@ -8,7 +8,7 @@ public class MancalaController {
     private MancalaModel model;
     private MancalaView view;
     private int undoCount;
-    private boolean freeTurn;
+    boolean freeTurn;
     boolean turnPerformed = false;
 
     public MancalaController(MancalaModel model, MancalaView view)

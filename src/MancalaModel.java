@@ -123,7 +123,9 @@ public class MancalaModel {
         // If last stone lands in own Mancala, player gets another turn
         if ((isPlayerA && lastIndex == 6) || (!isPlayerA && lastIndex == 13)) {
             freeTurn = 1;
-            return; // Free turn, do not toggle player
+            return;
+        }else{
+            freeTurn = 0;
         }
 
         // Toggle turn to the other player
@@ -138,6 +140,7 @@ public class MancalaModel {
             if (pits[i] > 0) playerAPitsEmpty = false;
             if (pits[i + 6] > 0) playerBPitsEmpty = false;
         }
+
 
         return playerAPitsEmpty || playerBPitsEmpty;
     }
@@ -156,8 +159,11 @@ public class MancalaModel {
         for (int i = 0; i < 6; i++) {
             mancalaA += pits[i];
             pits[i] = 0;
-            mancalaB += pits[i + 6];
-            pits[i + 6] = 0;
+        }
+
+        for (int i = 6; i < 12; i++) {
+            mancalaB += pits[i];
+            pits[i] = 0;
         }
     }
 
@@ -177,6 +183,7 @@ public class MancalaModel {
         public int[] getPits() {
             return pits.clone();
         }
+
 
         public int getMancalaA() {
             return mancalaA;

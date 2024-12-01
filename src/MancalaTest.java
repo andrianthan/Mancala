@@ -3,6 +3,7 @@ public class MancalaTest {
     public static void main (String[] args)
     {
         JFrame frame = new JFrame();
+
         // Get the number of stones per pit (3 or 4) with validation
         int stonesPerPit = 0;
         while (stonesPerPit != 3 && stonesPerPit != 4) {

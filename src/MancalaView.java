@@ -104,7 +104,7 @@ public class MancalaView extends JFrame {
         add(boardPanel, BorderLayout.CENTER);
 
         JPanel controlPanel = new JPanel();
-        undoButton = new JButton("Undos Left: 0");
+        undoButton = new JButton("Undos Left: 3");
         mancalaALabel = new JLabel(" Mancala A: 0");
         mancalaBLabel = new JLabel(" Mancala B: 0");
         freeTurnMessage = new JLabel();
@@ -146,6 +146,23 @@ public class MancalaView extends JFrame {
     public void updateBoard(){
         mancalaALabel.setText("Mancala A: " + model.getMancalaA() + " | ");
         mancalaBLabel.setText("Mancala B: " + model.getMancalaB() + " | ");
+        if(model.isFreeTurn())
+        {
+            setFreeTurnMessage("Free Turns: 1 | ");
+
+        }else {
+            setFreeTurnMessage("Free Turns: 0 | ");
+        }
+        if (model.isGameOver())
+        {
+            return;
+        }
+        if(model.isPlayerA())
+        {
+            message = "Current Player Turn: Player A ";
+        }else if(!(model.isPlayerA())) {
+            message = "Current Player Turn: Player B ";
+        }
         statusMessage.setText(message + " | ");
         boardPanel.repaint();
     }
@@ -165,7 +182,6 @@ public class MancalaView extends JFrame {
     {
         freeTurn = message;
         freeTurnMessage.setText(freeTurn);
-        updateBoard();
     }
 
     public void handleGameOver() {

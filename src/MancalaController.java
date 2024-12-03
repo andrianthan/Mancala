@@ -18,24 +18,23 @@ public class MancalaController {
         undoCount = model.getUndoCount();
         freeTurn = false;
 
+
+
+
         view.boardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
                 int pitIndex = view.getClickedPit(e.getX(), e.getY());
-                if(pitIndex != -1) {
-                    try{
+                if (pitIndex != -1) {
+                    try {
                         model.moveStones(pitIndex);
                         view.updateBoard();
-                        turnPerformed = true;
-                        if(model.isGameOver())
-                        {
+                        if (model.isGameOver()) {
                             view.handleGameOver();
-                        }else if(model.isFreeTurn())
-                        {
-                            view.setFreeTurnMessage("Free Turns: 1");
+                        } else {
+                            view.updateUndoButton(); // Update undo button after a move
                         }
-
-                    } catch (IllegalArgumentException ex){
+                    } catch (IllegalArgumentException ex) {
                         System.out.println(ex.getMessage());
                     }
                 } else {
@@ -47,23 +46,28 @@ public class MancalaController {
         view.undoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if(undoCount < 3 && turnPerformed == true)
-                {
+                if (model.isPlayerA() && model.lastPlayerToMoveIsPlayerA() && model.getPlayerAUndoCount() > 0) {
                     model.undo();
                     view.updateBoard();
-                    undoCount++;
-                    turnPerformed = false;
-                    view.undoButton.setText("Undos Left: " + (3 - undoCount));
-                    view.setStatusMessage("Move undone. " + (3 - undoCount) + " undos left.");
-                }else if (!turnPerformed)
-                {
-                    view.setStatusMessage("You must make a move before undoing again.");
-                }else if(undoCount >= 3)
-                {
-                    view.setStatusMessage("You've reached the undo limit.");
+                    view.undoButton.setText("Undos Left: " + model.getPlayerAUndoCount());
+                    view.setStatusMessage("Player A undid a move. " + model.getPlayerAUndoCount() + " undos left.");
+                } else if (!model.isPlayerA() && !model.lastPlayerToMoveIsPlayerA() && model.getPlayerBUndoCount() > 0) {
+                    model.undo();
+                    view.updateBoard();
+                    view.undoButton.setText("Undos Left: " + model.getPlayerBUndoCount());
+                    view.setStatusMessage("Player B undid a move. " + model.getPlayerBUndoCount() + " undos left.");
+                } else if (model.lastPlayerToMoveIsPlayerA() && !model.isPlayerA()) {
+                    view.setStatusMessage("Player B cannot undo Player A's move.");
+                } else if (!model.lastPlayerToMoveIsPlayerA() && model.isPlayerA()) {
+                    view.setStatusMessage("Player A cannot undo Player B's move.");
+                } else {
+                    view.setStatusMessage("No undos left.");
                 }
             }
         });
+
+
+
 
 
 

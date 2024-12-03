@@ -9,8 +9,13 @@ public class MancalaModel {
     private boolean isPlayerA;
     private int freeTurn = 0;
 
-    private int undoCount = 0;
+    private int playerAUndoCount = 3;
+    private int playerBUndoCount = 3;
+    private boolean lastPlayerToMoveIsPlayerA;
+
+
     // Stack to track undo functionality
+
     private Stack<GameState> history;
 
     // Stores the style of the board
@@ -52,30 +57,56 @@ public class MancalaModel {
     }
 
     public void togglePlayer() {
+        if (lastPlayerToMoveIsPlayerA != isPlayerA) {
+            // Reset undo count only when the turn switches
+            if (isPlayerA) {
+                playerAUndoCount = 3;
+            } else {
+                playerBUndoCount = 3;
+            }
+        }
         isPlayerA = !isPlayerA;
-        resetCounters();
+        freeTurn = 0;
     }
+
 
     public void saveState() {
         history.push(new GameState(pits.clone(), mancalaA, mancalaB, isPlayerA));
     }
 
+    public boolean lastPlayerToMoveIsPlayerA() {
+        return lastPlayerToMoveIsPlayerA;
+    }
+
+
     public void undo() {
         if (!history.isEmpty()) {
-            GameState prevState = history.pop();
-            this.pits = prevState.getPits();
-            this.mancalaA = prevState.getMancalaA();
-            this.mancalaB = prevState.getMancalaB();
-            this.isPlayerA = prevState.isPlayerA();
+            if (isPlayerA && playerAUndoCount > 0) {
+                GameState prevState = history.pop();
+                this.pits = prevState.getPits();
+                this.mancalaA = prevState.getMancalaA();
+                this.mancalaB = prevState.getMancalaB();
+                this.isPlayerA = prevState.isPlayerA();
+                playerAUndoCount--;
+            } else if (!isPlayerA && playerBUndoCount > 0) {
+                GameState prevState = history.pop();
+                this.pits = prevState.getPits();
+                this.mancalaA = prevState.getMancalaA();
+                this.mancalaB = prevState.getMancalaB();
+                this.isPlayerA = prevState.isPlayerA();
+                playerBUndoCount--;
+            }
         }
     }
+
+
 
     public void moveStones(int pitIndex) {
         if ((isPlayerA && pitIndex >= 6) || (!isPlayerA && pitIndex < 6)) {
             throw new IllegalArgumentException("Invalid pit selection!");
         }
 
-        // Save current state for undo functionality
+        // Save the current state for undo functionality
         saveState();
 
         int stones = pits[pitIndex];
@@ -103,7 +134,11 @@ public class MancalaModel {
 
         // Handle special rules
         handleSpecialRules(currentIndex);
+
+        // Track last player to move
+        lastPlayerToMoveIsPlayerA = isPlayerA;
     }
+
 
     private void handleSpecialRules(int lastIndex) {
         // If last stone lands in player's own empty pit, capture stones
@@ -204,14 +239,24 @@ public class MancalaModel {
         currentStyle = boardStyle;
     }
 
-    public int getUndoCount(){
-        return undoCount;
+
+    public int getPlayerAUndoCount() {
+        return playerAUndoCount;
     }
 
-    public void resetCounters()
-    {
-        freeTurn = 0;
-        undoCount = 3;
+    public int getPlayerBUndoCount() {
+        return playerBUndoCount;
     }
+
+
+    public void resetCounters() {
+        freeTurn = 0;
+        if (isPlayerA) {
+            playerAUndoCount = 3;
+        } else {
+            playerBUndoCount = 3;
+        }
+    }
+
 
 }

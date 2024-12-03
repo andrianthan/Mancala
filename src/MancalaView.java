@@ -229,4 +229,12 @@ public class MancalaView extends JFrame {
         setStatusMessage("Game Over! Player " + winner + " wins!");
     }
 
+    public void updateUndoButton() {
+        if (model.isPlayerA()) {
+            undoButton.setText("Undos Left: " + model.getPlayerAUndoCount());
+        } else {
+            undoButton.setText("Undos Left: " + model.getPlayerBUndoCount());
+        }
+    }
+
 }

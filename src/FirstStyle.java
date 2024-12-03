@@ -1,12 +1,25 @@
 import java.awt.Color;
 import java.awt.Graphics;
 
+/**
+ * @author Karla Nguyen
+ * FirstStyle class that implements BoardStyle
+ * one of the design styles the player can pick
+ */
 public class FirstStyle implements BoardStyle {
+    /**
+     * method to confirm board selection
+     */
     @Override
     public void boardSelection() {
         System.out.println("First style selected");
     }
-
+    /**
+     * method that draws the whole board
+     * draws the background, pits, Mancala pits, and stones
+     * @param view
+     * @param g
+     */
     @Override
     public void drawBoard(MancalaView view, Graphics g) {
         int width = view.getWindowWidth();
@@ -67,6 +80,7 @@ public class FirstStyle implements BoardStyle {
             g.drawString(String.valueOf(stones[i + 6]), 90 + i * (pitWidth + gap) + 25, height - 50);
         }
     }
+    // helper method to draw the players' pits
     private void drawPit(Graphics g, int x, int y, int width, int height, int stoneCount, Color color){
         g.setColor(color);
         g.fillOval(x, y, width, height);
@@ -83,7 +97,7 @@ public class FirstStyle implements BoardStyle {
             }
         }
     }
-    // Helper method to draw stones in a rectangular pit
+    // helper method to draw stones in the Mancala pit
     private void drawStonesInPit(Graphics g, int x, int y, int width, int height, int stoneCount, Color stoneColor) {
         int stoneRadius = 10;
         int padding = 5;

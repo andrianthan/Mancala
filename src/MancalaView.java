@@ -4,6 +4,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * @author Karla Nguyen
+ * class sview for Mancala game for the players to be able to view the game
+ */
 public class MancalaView extends JFrame {
     private MancalaModel model;
     private BoardStyle boardStyle;
@@ -31,6 +35,10 @@ public class MancalaView extends JFrame {
     //number of free turns left
     JLabel freeTurnMessage;
 
+    /**
+     * Mancala view constructor that boots up the GUI and detects the pits locations
+     * @param model
+     */
     public MancalaView(MancalaModel model) {
         this.model = model;
         setupGUI();
@@ -126,23 +134,36 @@ public class MancalaView extends JFrame {
         add(controlPanel, BorderLayout.SOUTH);
     }
 
-
+    /**
+     * getter method to get the model
+     * @return
+     */
     public MancalaModel getModel()
     {
         return model;
     }
 
+    /**
+     * getter method to get the window height
+     * @return
+     */
     public int getWindowHeight()
     {
         return height;
     }
 
+    /**
+     * getter method to get the window width
+     * @return
+     */
     public int getWindowWidth()
     {
         return width;
     }
 
-    //update board view when player makes a move
+    /**
+     * method to update board view when player makes a move
+     */
     public void updateBoard(){
         mancalaALabel.setText("Mancala A: " + model.getMancalaA() + " | ");
         mancalaBLabel.setText("Mancala B: " + model.getMancalaB() + " | ");
@@ -167,10 +188,18 @@ public class MancalaView extends JFrame {
         boardPanel.repaint();
     }
 
+    /**
+     * method to set the board style
+     * @param boardStyle
+     */
     public void setBoardStyle(BoardStyle boardStyle) {
         this.boardStyle = boardStyle;
     }
 
+    /**
+     * method to set the turn status message on the panel
+     * @param message
+     */
     public void setStatusMessage(String message)
     {
         this.message = message;
@@ -178,12 +207,19 @@ public class MancalaView extends JFrame {
         updateBoard();
     }
 
+    /**
+     * method to display how many free turns a player has on the panel
+     * @param message
+     */
     public void setFreeTurnMessage(String message)
     {
         freeTurn = message;
         freeTurnMessage.setText(freeTurn);
     }
 
+    /**
+     * method to display when the game is over
+     */
     public void handleGameOver() {
         model.collectRemainingStones();
         updateBoard();

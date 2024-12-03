@@ -38,6 +38,8 @@ public class MancalaController {
                     } catch (IllegalArgumentException ex){
                         System.out.println(ex.getMessage());
                     }
+                } else {
+                    view.setStatusMessage("Click on a valid pit");
                 }
             }
         });

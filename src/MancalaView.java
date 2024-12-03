@@ -51,12 +51,12 @@ public class MancalaView extends JFrame {
     }
 
     int getClickedPit(int x, int y) {
-        int pitWidth = 60;
-        int pitHeight = 60;
-        int gap = 20;
+        int pitWidth = 80;
+        int pitHeight = 80;
+        int gap = 30;
 
         for(int i = 0; i < 6; i++){
-            int pitX = 180 + i * (pitWidth + gap);
+            int pitX = 80 + i * (pitWidth + gap);
             int pitY = 50;
             if (x >= pitX && x <= pitX + pitWidth && y >= pitY && y <= pitY + pitHeight) {
                 return i;
@@ -64,8 +64,8 @@ public class MancalaView extends JFrame {
         }
 
         for(int i = 0; i < 6; i++){
-            int pitX = 180 + i * (pitWidth + gap);
-            int pitY = getHeight() - 120;
+            int pitX = 80 + i * (pitWidth + gap);
+            int pitY = getHeight() - 110;
             if(x>= pitX && x <= pitX + pitWidth && y >= pitY && y <= pitY + pitHeight) {
                 return i+6;
             }
@@ -192,4 +192,5 @@ public class MancalaView extends JFrame {
         String winner = mancalaA > mancalaB ? "A" : mancalaA < mancalaB ? "B" : "No one! It's a tie!";
         setStatusMessage("Game Over! Player " + winner + " wins!");
     }
+
 }

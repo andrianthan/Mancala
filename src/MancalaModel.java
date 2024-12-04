@@ -1,66 +1,89 @@
+/**
+ * The MancalaModel class represents the logic for a Mancala game.
+ * It manages the game board, player turns, and implements game rules
+ * such as stone distribution, capturing, and undo functionality.
+ *
+ * Programmed by: Nathan Dinh & Andrian Than
+ * Date: 2024-12-04
+ */
 import java.util.Stack;
 
 public class MancalaModel {
     private int[] pits;
     private int numStonesPerPit;
-    // Tracks whose turn it is
     private boolean isPlayerA;
     private int freeTurn = 0;
-
     private int playerAUndoCount = 3;
     private int playerBUndoCount = 3;
     private boolean lastPlayerToMoveIsPlayerA;
-
-
-    // Stack to track undo functionality
-
     private Stack<GameState> history;
-
-    // Stores the style of the board
     private BoardStyle currentStyle;
 
-
+    /**
+     * Constructs a MancalaModel with the specified number of stones per pit.
+     * @param numStonesPerPit The initial number of stones in each pit.
+     */
     public MancalaModel(int numStonesPerPit) {
         this.numStonesPerPit = numStonesPerPit;
-        // 14 pits, including Mancalas at indices 6 and 13
         pits = new int[14];
         isPlayerA = true;
         history = new Stack<>();
         initializeBoard();
     }
 
-
+    /**
+     * Initializes the game board with the specified number of stones per pit
+     * and sets the Mancalas to empty.
+     */
     private void initializeBoard() {
         for (int i = 0; i < pits.length; i++) {
-            if (i == 6 || i == 13) {
-                pits[i] = 0;
-            } else {
-                pits[i] = numStonesPerPit;
-            }
+            pits[i] = (i == 6 || i == 13) ? 0 : numStonesPerPit;
         }
     }
 
+    /**
+     * Gets the number of stones in Player A's Mancala.
+     * @return The number of stones in Mancala A.
+     */
     public int getMancalaA() {
         return pits[6];
     }
 
+    /**
+     * Gets the number of stones in Player B's Mancala.
+     * @return The number of stones in Mancala B.
+     */
     public int getMancalaB() {
         return pits[13];
     }
 
+    /**
+     * Gets a copy of the current state of the pits.
+     * @return An array representing the pits.
+     */
     public int[] getPits() {
         return pits.clone();
     }
 
+    /**
+     * Checks if it's Player A's turn.
+     * @return True if it's Player A's turn, false otherwise.
+     */
     public boolean isPlayerA() {
         return isPlayerA;
     }
 
+    /**
+     * Toggles the current player.
+     */
     public void togglePlayer() {
         isPlayerA = !isPlayerA;
         freeTurn = 0;
     }
 
+    /**
+     * Resets the undo count for the opponent player.
+     */
     private void resetOpponentUndoCount() {
         if (isPlayerA) {
             playerBUndoCount = 3;
@@ -69,31 +92,41 @@ public class MancalaModel {
         }
     }
 
+    /**
+     * Prepares for a new move by resetting counters and saving the game state.
+     */
     private void beginNewMove() {
         if (lastPlayerToMoveIsPlayerA != isPlayerA) {
             resetOpponentUndoCount();
         }
-
         saveState();
     }
 
-
+    /**
+     * Saves the current state of the game for undo functionality.
+     */
     public void saveState() {
         history.push(new GameState(pits.clone(), isPlayerA, freeTurn, lastPlayerToMoveIsPlayerA));
     }
+
+    /**
+     * Checks if the last move was made by Player A.
+     * @return True if the last move was made by Player A, false otherwise.
+     */
     public boolean lastPlayerToMoveIsPlayerA() {
         return lastPlayerToMoveIsPlayerA;
     }
 
-
-
+    /**
+     * Undoes the last move by restoring the previous game state.
+     */
     public void undo() {
         if (!history.isEmpty()) {
             GameState prevState = history.pop();
-            this.pits = prevState.getPits();
-            this.isPlayerA = prevState.isPlayerA();
-            this.freeTurn = prevState.getFreeTurn();
-            this.lastPlayerToMoveIsPlayerA = prevState.getLastPlayerToMoveIsPlayerA();
+            pits = prevState.getPits();
+            isPlayerA = prevState.isPlayerA();
+            freeTurn = prevState.getFreeTurn();
+            lastPlayerToMoveIsPlayerA = prevState.getLastPlayerToMoveIsPlayerA();
 
             if (isPlayerA) {
                 playerAUndoCount--;
@@ -103,8 +136,11 @@ public class MancalaModel {
         }
     }
 
-
-
+    /**
+     * Executes a move by redistributing stones from the selected pit.
+     * @param pitIndex The index of the pit to play.
+     * @throws IllegalArgumentException If the selected pit is invalid.
+     */
     public void moveStones(int pitIndex) {
         if ((isPlayerA && (pitIndex < 0 || pitIndex > 5)) || (!isPlayerA && (pitIndex < 7 || pitIndex > 12))) {
             throw new IllegalArgumentException("Invalid pit selection!");
@@ -123,22 +159,22 @@ public class MancalaModel {
             if (isPlayerA && currentIndex == 13) continue;
             if (!isPlayerA && currentIndex == 6) continue;
 
-            // Add stones to pits or Mancala
             pits[currentIndex]++;
             stones--;
         }
 
-        // Track last player to move
         lastPlayerToMoveIsPlayerA = isPlayerA;
 
         handleSpecialRules(currentIndex);
     }
 
-
-
+    /**
+     * Applies special rules such as capturing stones and granting free turns.
+     * @param lastIndex The index of the last pit where a stone was placed.
+     */
     private void handleSpecialRules(int lastIndex) {
         if (isPlayerA && lastIndex >= 0 && lastIndex < 6 && pits[lastIndex] == 1) {
-            int oppositePitIndex = 12 - lastIndex; // Opposite pit
+            int oppositePitIndex = 12 - lastIndex;
             pits[6] += pits[oppositePitIndex] + pits[lastIndex];
             pits[oppositePitIndex] = 0;
             pits[lastIndex] = 0;
@@ -151,14 +187,16 @@ public class MancalaModel {
 
         if ((isPlayerA && lastIndex == 6) || (!isPlayerA && lastIndex == 13)) {
             freeTurn = 1;
-            return;
         } else {
             freeTurn = 0;
+            togglePlayer();
         }
-
-        togglePlayer();
     }
 
+    /**
+     * Checks if the game is over.
+     * @return True if all pits on one side are empty, false otherwise.
+     */
     public boolean isGameOver() {
         boolean playerAPitsEmpty = true;
         boolean playerBPitsEmpty = true;
@@ -173,16 +211,17 @@ public class MancalaModel {
         return playerAPitsEmpty || playerBPitsEmpty;
     }
 
-    public boolean isFreeTurn()
-    {
-        if (freeTurn >= 1)
-        {
-            return true;
-        }else{
-            return false;
-        }
+    /**
+     * Checks if the current player has a free turn.
+     * @return True if the player has a free turn, false otherwise.
+     */
+    public boolean isFreeTurn() {
+        return freeTurn >= 1;
     }
 
+    /**
+     * Collects all remaining stones from the pits and places them in the Mancalas.
+     */
     public void collectRemainingStones() {
         for (int i = 0; i < 6; i++) {
             pits[6] += pits[i];
@@ -195,13 +234,58 @@ public class MancalaModel {
         }
     }
 
+    /**
+     * Sets the style of the board.
+     * @param boardStyle The desired board style.
+     */
+    public void setBoardStyle(BoardStyle boardStyle) {
+        currentStyle = boardStyle;
+    }
+
+    /**
+     * Gets the remaining undo count for Player A.
+     * @return The number of undos left for Player A.
+     */
+    public int getPlayerAUndoCount() {
+        return playerAUndoCount;
+    }
+
+    /**
+     * Gets the remaining undo count for Player B.
+     * @return The number of undos left for Player B.
+     */
+    public int getPlayerBUndoCount() {
+        return playerBUndoCount;
+    }
+
+    /**
+     * Resets the undo counters and free turn state.
+     */
+    public void resetCounters() {
+        freeTurn = 0;
+        if (isPlayerA) {
+            playerAUndoCount = 3;
+        } else {
+            playerBUndoCount = 3;
+        }
+    }
+
+    /**
+     * A nested class representing the state of the game for undo functionality.
+     */
     private static class GameState {
         private final int[] pits;
         private final boolean isPlayerA;
         private final int freeTurn;
         private final boolean lastPlayerToMoveIsPlayerA;
 
-
+        /**
+         * Constructs a GameState with the specified parameters.
+         * @param pits The current state of the pits.
+         * @param isPlayerA The current player.
+         * @param freeTurn The number of free turns available.
+         * @param lastPlayerToMoveIsPlayerA Whether the last move was made by Player A.
+         */
         public GameState(int[] pits, boolean isPlayerA, int freeTurn, boolean lastPlayerToMoveIsPlayerA) {
             this.pits = pits;
             this.isPlayerA = isPlayerA;
@@ -221,35 +305,8 @@ public class MancalaModel {
             return freeTurn;
         }
 
-        public boolean getLastPlayerToMoveIsPlayerA(){
+        public boolean getLastPlayerToMoveIsPlayerA() {
             return lastPlayerToMoveIsPlayerA;
         }
     }
-
-
-    public void setBoardStyle(BoardStyle boardStyle)
-    {
-        currentStyle = boardStyle;
-    }
-
-
-    public int getPlayerAUndoCount() {
-        return playerAUndoCount;
-    }
-
-    public int getPlayerBUndoCount() {
-        return playerBUndoCount;
-    }
-
-
-    public void resetCounters() {
-        freeTurn = 0;
-        if (isPlayerA) {
-            playerAUndoCount = 3;
-        } else {
-            playerBUndoCount = 3;
-        }
-    }
-
-
 }

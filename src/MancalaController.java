@@ -3,22 +3,32 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-
+/**
+ * The MancalaController class handles user interactions and controls the flow of the Mancala game.
+ * It acts as a connector between the model and the view, managing updates and game logic.
+ *
+ * Programmed by: Andrian Than
+ * Date: 2024-12-04
+ */
 public class MancalaController {
     private MancalaModel model;
     private MancalaView view;
     boolean freeTurn;
     boolean turnPerformed = false;
 
-    public MancalaController(MancalaModel model, MancalaView view)
-    {
+    /**
+     * Constructs a MancalaController with the given model and view.
+     * Sets up listeners for user interactions and initializes the game state.
+     *
+     * @param model The MancalaModel instance managing game logic.
+     * @param view  The MancalaView instance managing the user interface.
+     */
+    public MancalaController(MancalaModel model, MancalaView view) {
         this.model = model;
         this.view = view;
         freeTurn = false;
 
-
-
-
+        // Add a mouse listener for handling clicks on the game board
         view.boardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -44,11 +54,12 @@ public class MancalaController {
                         view.setStatusMessage("You can only click on your own pits.");
                     }
                 } else {
-                    view.setStatusMessage("Click on a valid pit");
+                    view.setStatusMessage("Click on a valid pit.");
                 }
             }
         });
 
+        // Add an action listener for the undo button
         view.undoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -67,11 +78,7 @@ public class MancalaController {
             }
         });
 
-
-
-
-
-
+        // Add an action listener for the first style button
         view.firstStyleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -84,6 +91,7 @@ public class MancalaController {
             }
         });
 
+        // Add an action listener for the second style button
         view.secondStyleButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -94,10 +102,5 @@ public class MancalaController {
                 view.updateBoard();
             }
         });
-
-
-
     }
-
-
-   }
+}

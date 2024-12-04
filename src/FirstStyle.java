@@ -2,13 +2,16 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 /**
- * @author Karla Nguyen & Andrian Than
- * FirstStyle class that implements BoardStyle
- * one of the design styles the player can pick
+ * The FirstStyle class represents one of the design styles that a player can select in the Mancala game.
+ * This style customizes the visual representation of the game board, including pits, Mancala pits, and stones.
+ *
+ * Programmed by: Karla Nguyen & Andrian Than
+ * Date: 2024-12-04
  */
 public class FirstStyle implements BoardStyle {
     /**
-     * Method to confirm board selection.
+     * Confirms the selection of the "First Style" board design.
+     * Outputs a confirmation message to the console.
      */
     @Override
     public void boardSelection() {
@@ -16,16 +19,17 @@ public class FirstStyle implements BoardStyle {
     }
 
     /**
-     * Method that draws the whole board.
-     * Draws the background, pits, Mancala pits, and stones.
-     * @param view
-     * @param g
+     * Draws the entire game board, including the background, pits, Mancala pits, and stones.
+     *
+     * @param view The MancalaView instance providing the game board dimensions and state.
+     * @param g    The Graphics object used to draw the board and its components.
      */
     @Override
     public void drawBoard(MancalaView view, Graphics g) {
         int width = view.getWindowWidth();
         int height = view.getWindowHeight() - 50;
         int[] stones = view.getModel().getPits();
+
         // Background color
         g.setColor(Color.DARK_GRAY);
         g.fillRect(0, 0, width, height);
@@ -35,7 +39,7 @@ public class FirstStyle implements BoardStyle {
         g.drawString("Pit A", width - 50, height - 350);
         g.drawString("Pit B", 20, height - 350);
 
-        // Draw Mancala B pit
+        // Draw Player B's Mancala pit
         g.setColor(Color.CYAN);
         g.fillRect(10, height / 4, 50, height / 2); // Player B's Mancala
         g.setColor(Color.WHITE);
@@ -44,7 +48,7 @@ public class FirstStyle implements BoardStyle {
         int mancalaBStones = view.getModel().getMancalaB();
         drawStonesInPit(g, 10, height / 4, 50, height / 2, mancalaBStones, Color.WHITE);
 
-        // Draw Mancala A pit
+        // Draw Player A's Mancala pit
         g.setColor(Color.CYAN);
         g.fillRect(width - 60, height / 4, 50, height / 2); // Player A's Mancala
         g.setColor(Color.WHITE);
@@ -53,7 +57,7 @@ public class FirstStyle implements BoardStyle {
         int mancalaAStones = view.getModel().getMancalaA();
         drawStonesInPit(g, width - 60, height / 4, 50, height / 2, mancalaAStones, Color.WHITE);
 
-        // Draw pits
+        // Pit dimensions and spacing
         int pitWidth = 80;
         int pitHeight = 80;
         int gap = 30;
@@ -68,14 +72,14 @@ public class FirstStyle implements BoardStyle {
             drawPit(g, 80 + i * (pitWidth + gap), height - 110, pitWidth, pitHeight, stones[i], Color.BLUE);
         }
 
-        // Player B's pit labels & stone count
+        // Player B's pit labels & stone counts
         for (int i = 0; i < 6; i++) {
             g.setColor(Color.WHITE);
             g.drawString("B" + (6 - i), 90 + i * (pitWidth + gap) + 20, 45);
             g.drawString(String.valueOf(stones[12 - i]), 90 + i * (pitWidth + gap) + 25, 110);
         }
 
-        // Player A's pit labels & stone count
+        // Player A's pit labels & stone counts
         for (int i = 0; i < 6; i++) {
             g.setColor(Color.WHITE);
             g.drawString("A" + (i + 1), 90 + i * (pitWidth + gap) + 20, height - 120);
@@ -83,7 +87,17 @@ public class FirstStyle implements BoardStyle {
         }
     }
 
-    // helper method to draw the players' pits
+    /**
+     * Helper method to draw a player's pit, including stones inside it.
+     *
+     * @param g          The Graphics object used for drawing.
+     * @param x          The x-coordinate of the pit.
+     * @param y          The y-coordinate of the pit.
+     * @param width      The width of the pit.
+     * @param height     The height of the pit.
+     * @param stoneCount The number of stones in the pit.
+     * @param color      The color of the pit.
+     */
     private void drawPit(Graphics g, int x, int y, int width, int height, int stoneCount, Color color) {
         g.setColor(color);
         g.fillOval(x, y, width, height);
@@ -101,7 +115,17 @@ public class FirstStyle implements BoardStyle {
         }
     }
 
-    // helper method to draw stones in the Mancala pit
+    /**
+     * Helper method to draw stones inside a Mancala pit.
+     *
+     * @param g          The Graphics object used for drawing.
+     * @param x          The x-coordinate of the Mancala pit.
+     * @param y          The y-coordinate of the Mancala pit.
+     * @param width      The width of the Mancala pit.
+     * @param height     The height of the Mancala pit.
+     * @param stoneCount The number of stones in the Mancala pit.
+     * @param stoneColor The color of the stones.
+     */
     private void drawStonesInPit(Graphics g, int x, int y, int width, int height, int stoneCount, Color stoneColor) {
         int stoneRadius = 10;
         int padding = 5;

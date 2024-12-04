@@ -1,19 +1,21 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * @author Karla Nguyen
- * class sview for Mancala game for the players to be able to view the game
+ * The MancalaView class provides the graphical user interface (GUI) for the Mancala game.
+ * It allows players to interact with the game by clicking pits, viewing the board, and tracking game status.
+ * The class also handles displaying board styles and updates during gameplay.
+ *
+ * Programmed by: Karla Nguyen & Nathan Dinh
+ * Date: 2024-12-04
  */
 public class MancalaView extends JFrame {
     private MancalaModel model;
     private BoardStyle boardStyle;
     JPanel boardPanel;
     JButton undoButton;
-
     JButton firstStyleButton;
     JButton secondStyleButton;
     JPanel stylePanel;
@@ -23,26 +25,28 @@ public class MancalaView extends JFrame {
     String message = "";
     String freeTurn;
 
-    //number of stones in mancala A
+    // Displays the number of stones in Mancala A
     JLabel mancalaALabel;
 
-    //number of stones in mancala B
+    // Displays the number of stones in Mancala B
     JLabel mancalaBLabel;
 
-    //status message of the game
+    // Status message of the game
     JLabel statusMessage;
 
-    //number of free turns left
+    // Displays the number of free turns left
     JLabel freeTurnMessage;
 
     /**
-     * Mancala view constructor that boots up the GUI and detects the pits locations
-     * @param model
+     * Constructs the MancalaView and initializes the GUI.
+     * Sets up listeners to detect pit clicks and user actions.
+     *
+     * @param model The MancalaModel instance managing the game logic.
      */
     public MancalaView(MancalaModel model) {
         this.model = model;
         setupGUI();
-        // mouse listener to detect clicks on pits
+        // Mouse listener to detect clicks on pits
         boardPanel.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -51,13 +55,26 @@ public class MancalaView extends JFrame {
         });
     }
 
+    /**
+     * Handles pit clicks by identifying the clicked pit index.
+     *
+     * @param x The x-coordinate of the click.
+     * @param y The y-coordinate of the click.
+     */
     private void handlePitClick(int x, int y) {
-        int pitIndex = getClickedPit(x,y);
-        if(pitIndex != -1) {
+        int pitIndex = getClickedPit(x, y);
+        if (pitIndex != -1) {
             System.out.println("pitIndex: " + pitIndex);
         }
     }
 
+    /**
+     * Identifies which pit was clicked based on the coordinates of the click.
+     *
+     * @param x The x-coordinate of the click.
+     * @param y The y-coordinate of the click.
+     * @return The index of the clicked pit, or -1 if no pit was clicked.
+     */
     int getClickedPit(int x, int y) {
         int pitWidth = 80;
         int pitHeight = 80;
@@ -84,15 +101,17 @@ public class MancalaView extends JFrame {
         return -1; // If no pit was clicked
     }
 
-
+    /**
+     * Sets up the GUI components, including panels, buttons, and labels.
+     */
     private void setupGUI() {
-        //set up screen
+        // Set up screen
         setTitle("Mancala Game");
         setSize(width, height);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        //set up panels for user to select board style
+        // Set up panels for board style selection
         stylePanel = new JPanel();
         firstStyleButton = new JButton("First Style");
         secondStyleButton = new JButton("Second Style");
@@ -102,12 +121,13 @@ public class MancalaView extends JFrame {
         add(stylePanel, BorderLayout.NORTH);
         stylePanel.setVisible(true);
         setVisible(true);
-        //Pit buttons and setup
-        boardPanel = new JPanel(){
+
+        // Set up the board panel
+        boardPanel = new JPanel() {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                if(boardStyle != null) {
+                if (boardStyle != null) {
                     boardStyle.drawBoard(MancalaView.this, g);
                 }
             }
@@ -115,6 +135,7 @@ public class MancalaView extends JFrame {
         boardPanel.setPreferredSize(new Dimension(800, 500));
         add(boardPanel, BorderLayout.CENTER);
 
+        // Set up the control panel
         JPanel controlPanel = new JPanel();
         undoButton = new JButton("Undos Left: 3");
         mancalaALabel = new JLabel(" Mancala A: 0");
@@ -125,7 +146,7 @@ public class MancalaView extends JFrame {
         Font boldFont = new Font(font.getFontName(), font.BOLD, font.getSize());
         statusMessage.setFont(boldFont);
         statusMessage.setFont(font);
-        message= "Current Player Turn: Player A ";
+        message = "Current Player Turn: Player A ";
         freeTurn = "Free Turns: 0 | ";
         setFreeTurnMessage(freeTurn);
         setStatusMessage(message);
@@ -133,59 +154,54 @@ public class MancalaView extends JFrame {
         controlPanel.add(freeTurnMessage);
         controlPanel.add(mancalaALabel);
         controlPanel.add(mancalaBLabel);
-
         controlPanel.add(undoButton);
         add(controlPanel, BorderLayout.SOUTH);
     }
 
     /**
-     * getter method to get the model
-     * @return
+     * Gets the model associated with this view.
+     *
+     * @return The MancalaModel instance.
      */
-    public MancalaModel getModel()
-    {
+    public MancalaModel getModel() {
         return model;
     }
 
     /**
-     * getter method to get the window height
-     * @return
+     * Gets the height of the game window.
+     *
+     * @return The window height.
      */
-    public int getWindowHeight()
-    {
+    public int getWindowHeight() {
         return height;
     }
 
     /**
-     * getter method to get the window width
-     * @return
+     * Gets the width of the game window.
+     *
+     * @return The window width.
      */
-    public int getWindowWidth()
-    {
+    public int getWindowWidth() {
         return width;
     }
 
     /**
-     * method to update board view when player makes a move
+     * Updates the board view after a move.
      */
-    public void updateBoard(){
+    public void updateBoard() {
         mancalaALabel.setText("Mancala A: " + model.getMancalaA() + " | ");
         mancalaBLabel.setText("Mancala B: " + model.getMancalaB() + " | ");
-        if(model.isFreeTurn())
-        {
+        if (model.isFreeTurn()) {
             setFreeTurnMessage("Free Turns: 1 | ");
-
-        }else {
+        } else {
             setFreeTurnMessage("Free Turns: 0 | ");
         }
-        if (model.isGameOver())
-        {
+        if (model.isGameOver()) {
             return;
         }
-        if(model.isPlayerA())
-        {
+        if (model.isPlayerA()) {
             message = "Current Player Turn: Player A ";
-        }else if(!(model.isPlayerA())) {
+        } else {
             message = "Current Player Turn: Player B ";
         }
         statusMessage.setText(message + " | ");
@@ -193,36 +209,37 @@ public class MancalaView extends JFrame {
     }
 
     /**
-     * method to set the board style
-     * @param boardStyle
+     * Sets the board style for the game.
+     *
+     * @param boardStyle The BoardStyle instance to apply.
      */
     public void setBoardStyle(BoardStyle boardStyle) {
         this.boardStyle = boardStyle;
     }
 
     /**
-     * method to set the turn status message on the panel
-     * @param message
+     * Sets the status message displayed on the panel.
+     *
+     * @param message The status message to display.
      */
-    public void setStatusMessage(String message)
-    {
+    public void setStatusMessage(String message) {
         this.message = message;
         statusMessage.setText(message);
         updateBoard();
     }
 
     /**
-     * method to display how many free turns a player has on the panel
-     * @param message
+     * Sets the free turn message displayed on the panel.
+     *
+     * @param message The free turn message to display.
      */
-    public void setFreeTurnMessage(String message)
-    {
+    public void setFreeTurnMessage(String message) {
         freeTurn = message;
         freeTurnMessage.setText(freeTurn);
     }
 
     /**
-     * method to display when the game is over
+     * Displays a game-over message and determines the winner.
      */
     public void handleGameOver() {
         model.collectRemainingStones();
@@ -233,6 +250,9 @@ public class MancalaView extends JFrame {
         setStatusMessage("Game Over! Player " + winner + " wins!");
     }
 
+    /**
+     * Updates the undo button text based on the current player and remaining undos.
+     */
     public void updateUndoButton() {
         if (model.isPlayerA()) {
             undoButton.setText("Undos Left: " + model.getPlayerBUndoCount());
@@ -240,5 +260,4 @@ public class MancalaView extends JFrame {
             undoButton.setText("Undos Left: " + model.getPlayerAUndoCount());
         }
     }
-
 }

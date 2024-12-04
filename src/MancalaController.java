@@ -7,7 +7,6 @@ import java.awt.event.MouseEvent;
 public class MancalaController {
     private MancalaModel model;
     private MancalaView view;
-    private int undoCount;
     boolean freeTurn;
     boolean turnPerformed = false;
 
@@ -15,7 +14,6 @@ public class MancalaController {
     {
         this.model = model;
         this.view = view;
-        undoCount = model.getUndoCount();
         freeTurn = false;
 
 
@@ -46,23 +44,18 @@ public class MancalaController {
         view.undoButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (model.isPlayerA() && model.lastPlayerToMoveIsPlayerA() && model.getPlayerAUndoCount() > 0) {
+                if (model.lastPlayerToMoveIsPlayerA() && model.getPlayerAUndoCount() > 0) {
                     model.undo();
                     view.updateBoard();
-                    view.undoButton.setText("Undos Left: " + model.getPlayerAUndoCount());
                     view.setStatusMessage("Player A undid a move. " + model.getPlayerAUndoCount() + " undos left.");
-                } else if (!model.isPlayerA() && !model.lastPlayerToMoveIsPlayerA() && model.getPlayerBUndoCount() > 0) {
+                } else if (!model.lastPlayerToMoveIsPlayerA() && model.getPlayerBUndoCount() > 0) {
                     model.undo();
                     view.updateBoard();
-                    view.undoButton.setText("Undos Left: " + model.getPlayerBUndoCount());
                     view.setStatusMessage("Player B undid a move. " + model.getPlayerBUndoCount() + " undos left.");
-                } else if (model.lastPlayerToMoveIsPlayerA() && !model.isPlayerA()) {
-                    view.setStatusMessage("Player B cannot undo Player A's move.");
-                } else if (!model.lastPlayerToMoveIsPlayerA() && model.isPlayerA()) {
-                    view.setStatusMessage("Player A cannot undo Player B's move.");
                 } else {
-                    view.setStatusMessage("No undos left.");
+                    view.setStatusMessage("No undos left or cannot undo opponent's move.");
                 }
+                view.updateUndoButton();
             }
         });
 

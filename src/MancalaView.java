@@ -235,9 +235,9 @@ public class MancalaView extends JFrame {
 
     public void updateUndoButton() {
         if (model.isPlayerA()) {
-            undoButton.setText("Undos Left: " + model.getPlayerAUndoCount());
-        } else {
             undoButton.setText("Undos Left: " + model.getPlayerBUndoCount());
+        } else {
+            undoButton.setText("Undos Left: " + model.getPlayerAUndoCount());
         }
     }
 

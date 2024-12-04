@@ -2,8 +2,6 @@ import java.util.Stack;
 
 public class MancalaModel {
     private int[] pits;
-    private int mancalaA;
-    private int mancalaB;
     private int numStonesPerPit;
     // Tracks whose turn it is
     private boolean isPlayerA;
@@ -26,8 +24,6 @@ public class MancalaModel {
         this.numStonesPerPit = numStonesPerPit;
         // 14 pits, including Mancalas at indices 6 and 13
         pits = new int[14];
-        mancalaA = 0;
-        mancalaB = 0;
         isPlayerA = true;
         history = new Stack<>();
         initializeBoard();
@@ -61,21 +57,29 @@ public class MancalaModel {
     }
 
     public void togglePlayer() {
-        if (lastPlayerToMoveIsPlayerA != isPlayerA) {
-            // Reset undo count only when the turn switches
-            if (isPlayerA) {
-                playerAUndoCount = 3;
-            } else {
-                playerBUndoCount = 3;
-            }
-        }
         isPlayerA = !isPlayerA;
         freeTurn = 0;
     }
 
+    private void resetOpponentUndoCount() {
+        if (isPlayerA) {
+            playerBUndoCount = 3;
+        } else {
+            playerAUndoCount = 3;
+        }
+    }
+
+    private void beginNewMove() {
+        if (lastPlayerToMoveIsPlayerA != isPlayerA) {
+            resetOpponentUndoCount();
+        }
+
+        saveState();
+    }
+
 
     public void saveState() {
-        history.push(new GameState(pits.clone(), isPlayerA, freeTurn));
+        history.push(new GameState(pits.clone(), isPlayerA, freeTurn, lastPlayerToMoveIsPlayerA));
     }
     public boolean lastPlayerToMoveIsPlayerA() {
         return lastPlayerToMoveIsPlayerA;
@@ -89,6 +93,8 @@ public class MancalaModel {
             this.pits = prevState.getPits();
             this.isPlayerA = prevState.isPlayerA();
             this.freeTurn = prevState.getFreeTurn();
+            this.lastPlayerToMoveIsPlayerA = prevState.getLastPlayerToMoveIsPlayerA();
+
             if (isPlayerA) {
                 playerAUndoCount--;
             } else {
@@ -100,57 +106,37 @@ public class MancalaModel {
 
 
     public void moveStones(int pitIndex) {
-        // Validate pit selection based on the current player
         if ((isPlayerA && (pitIndex < 0 || pitIndex > 5)) || (!isPlayerA && (pitIndex < 7 || pitIndex > 12))) {
             throw new IllegalArgumentException("Invalid pit selection!");
         }
 
-        // Save the current state for undo functionality
-        saveState();
+        beginNewMove();
 
         int stones = pits[pitIndex];
         pits[pitIndex] = 0;
         int currentIndex = pitIndex;
 
-        if(isPlayerA)
-        {
-            while (stones > 0) {
-                currentIndex = (currentIndex + 1) % 14;
-                System.out.println("Pit Index : "+ currentIndex);
+        while (stones > 0) {
+            currentIndex = (currentIndex + 1) % 14;
 
-                // Skip opponent's Mancala
-                if (currentIndex == 13) continue;
-                // Add stones to pits or Mancala
-                pits[currentIndex]++;
-                System.out.println(pits[currentIndex]);
-                stones--;
-                System.out.println(stones);
+            // Skip opponent's Mancala
+            if (isPlayerA && currentIndex == 13) continue;
+            if (!isPlayerA && currentIndex == 6) continue;
 
-            }
-        }else {
-            while(stones > 0)
-            {
-               currentIndex = (currentIndex + 1 ) % 14 ;
-               System.out.println("Pit Index : "+ currentIndex);
-               if(currentIndex == 6) continue;
-               pits[currentIndex]++;
-                System.out.println(pits[currentIndex]);
-               stones--;
-               System.out.println(stones);
-            }
+            // Add stones to pits or Mancala
+            pits[currentIndex]++;
+            stones--;
         }
-
-
-        // Handle special rules
-        handleSpecialRules(currentIndex);
 
         // Track last player to move
         lastPlayerToMoveIsPlayerA = isPlayerA;
+
+        handleSpecialRules(currentIndex);
     }
 
 
+
     private void handleSpecialRules(int lastIndex) {
-        // If last stone lands in player's own empty pit, capture stones
         if (isPlayerA && lastIndex >= 0 && lastIndex < 6 && pits[lastIndex] == 1) {
             int oppositePitIndex = 12 - lastIndex; // Opposite pit
             pits[6] += pits[oppositePitIndex] + pits[lastIndex];
@@ -163,7 +149,6 @@ public class MancalaModel {
             pits[lastIndex] = 0;
         }
 
-        // If last stone lands in own Mancala, player gets another turn
         if ((isPlayerA && lastIndex == 6) || (!isPlayerA && lastIndex == 13)) {
             freeTurn = 1;
             return;
@@ -171,7 +156,6 @@ public class MancalaModel {
             freeTurn = 0;
         }
 
-        // Toggle turn to the other player
         togglePlayer();
     }
 
@@ -215,11 +199,14 @@ public class MancalaModel {
         private final int[] pits;
         private final boolean isPlayerA;
         private final int freeTurn;
+        private final boolean lastPlayerToMoveIsPlayerA;
 
-        public GameState(int[] pits, boolean isPlayerA, int freeTurn) {
+
+        public GameState(int[] pits, boolean isPlayerA, int freeTurn, boolean lastPlayerToMoveIsPlayerA) {
             this.pits = pits;
             this.isPlayerA = isPlayerA;
             this.freeTurn = freeTurn;
+            this.lastPlayerToMoveIsPlayerA = lastPlayerToMoveIsPlayerA;
         }
 
         public int[] getPits() {
@@ -232,6 +219,10 @@ public class MancalaModel {
 
         public int getFreeTurn() {
             return freeTurn;
+        }
+
+        public boolean getLastPlayerToMoveIsPlayerA(){
+            return lastPlayerToMoveIsPlayerA;
         }
     }
 

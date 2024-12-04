@@ -63,24 +63,27 @@ public class MancalaView extends JFrame {
         int pitHeight = 80;
         int gap = 30;
 
-        // Player A's pits (Top Row)
+        // Player B's pits (Top Row: B6 to B1)
         for (int i = 0; i < 6; i++) {
             int pitX = 80 + i * (pitWidth + gap);
             int pitY = 50;
             if (x >= pitX && x <= pitX + pitWidth && y >= pitY && y <= pitY + pitHeight) {
-                return i; // Indices 0 to 5
+                return 12 - i; // Indices 12 (B6) down to 7 (B1)
             }
         }
 
+        // Player A's pits (Bottom Row: A1 to A6)
         for (int i = 0; i < 6; i++) {
             int pitX = 80 + i * (pitWidth + gap);
             int pitY = getHeight() - 110;
             if (x >= pitX && x <= pitX + pitWidth && y >= pitY && y <= pitY + pitHeight) {
-                return 12 - i; // Indices 12 down to 7
+                return i; // Indices 0 (A1) to 5 (A6)
             }
         }
-        return -1;
+
+        return -1; // If no pit was clicked
     }
+
 
     private void setupGUI() {
         //set up screen

@@ -24,16 +24,24 @@ public class MancalaController {
             public void mouseClicked(MouseEvent e) {
                 int pitIndex = view.getClickedPit(e.getX(), e.getY());
                 if (pitIndex != -1) {
-                    try {
-                        model.moveStones(pitIndex);
-                        view.updateBoard();
-                        if (model.isGameOver()) {
-                            view.handleGameOver();
-                        } else {
-                            view.updateUndoButton(); // Update undo button after a move
+                    boolean isPlayerA = model.isPlayerA();
+                    boolean isPlayerAPit = pitIndex >= 0 && pitIndex < 6;  // Player A's pits are from index 0 to 5
+                    boolean isPlayerBPit = pitIndex >= 7 && pitIndex <= 12; // Player B's pits are from index 7 to 12
+
+                    if ((isPlayerA && isPlayerAPit) || (!isPlayerA && isPlayerBPit)) {
+                        try {
+                            model.moveStones(pitIndex);
+                            view.updateBoard();
+                            if (model.isGameOver()) {
+                                view.handleGameOver();
+                            } else {
+                                view.updateUndoButton(); // Update undo button after a move
+                            }
+                        } catch (IllegalArgumentException ex) {
+                            System.out.println(ex.getMessage());
                         }
-                    } catch (IllegalArgumentException ex) {
-                        System.out.println(ex.getMessage());
+                    } else {
+                        view.setStatusMessage("You can only click on your own pits.");
                     }
                 } else {
                     view.setStatusMessage("Click on a valid pit");

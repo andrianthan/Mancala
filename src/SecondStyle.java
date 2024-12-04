@@ -57,47 +57,49 @@ public class SecondStyle implements BoardStyle {
         int pitHeight = 80;
         int gap = 30;
 
-        // Draw Player A's pits
+        // Draw Player A's pits (bottom row, left to right A1 to A6)
         for (int i = 0; i < 6; i++) {
-            drawPit(g, 80 + i * (pitWidth + gap), 50, pitWidth, pitHeight, stones[i], Color.GREEN);
+            drawPit(g, 80 + i * (pitWidth + gap), height - 110, pitWidth, pitHeight, stones[i], Color.GREEN);
         }
 
-        // Draw Player B's pits
+        // Draw Player B's pits (top row, left to right B6 to B1)
         for (int i = 0; i < 6; i++) {
-            drawPit(g, 80 + i * (pitWidth + gap), height - 110, pitWidth, pitHeight, stones[12 - i], Color.MAGENTA);
+            drawPit(g, 80 + i * (pitWidth + gap), 50, pitWidth, pitHeight, stones[12 - i], Color.MAGENTA);
         }
 
-        // Player A's pit labels & stone count
+        // Player A's pit labels & stone count (bottom row)
         for (int i = 0; i < 6; i++) {
             g.setColor(Color.WHITE);
-            g.drawString("A" + (6 - i), 90 + i * (pitWidth + gap) + 20, 45);
-            g.drawString(String.valueOf(stones[i]), 90 + i * (pitWidth + gap) + 25, 110);
+            g.drawString("A" + (i + 1), 90 + i * (pitWidth + gap) + 20, height - 120);
+            g.drawString(String.valueOf(stones[i]), 90 + i * (pitWidth + gap) + 25, height - 50);
         }
 
-        // Player B's pit labels & stone count (bottom row) with corrected indices
+        // Player B's pit labels & stone count (top row)
         for (int i = 0; i < 6; i++) {
             g.setColor(Color.WHITE);
-            g.drawString("B" + (i + 1), 90 + i * (pitWidth + gap) + 20, height - 120);
-            g.drawString(String.valueOf(stones[12 - i]), 90 + i * (pitWidth + gap) + 25, height - 50);
+            g.drawString("B" + (6 - i), 90 + i * (pitWidth + gap) + 20, 45);
+            g.drawString(String.valueOf(stones[12 - i]), 90 + i * (pitWidth + gap) + 25, 110);
         }
     }
+
     // helper method to draw the players' pits
-    private void drawPit(Graphics g, int x, int y, int width, int height, int stoneCount, Color color){
+    private void drawPit(Graphics g, int x, int y, int width, int height, int stoneCount, Color color) {
         g.setColor(color);
         g.fillRect(x, y, width, height);
         g.setColor(Color.WHITE);
         int stoneRadius = 10;
         int stonesPerRow = 3;
-        for(int i = 0; i < stoneCount; i++){
+        for (int i = 0; i < stoneCount; i++) {
             int row = i / stonesPerRow;
             int col = i % stonesPerRow;
-            int stoneX = x + 20 + col * (stoneRadius+5);
-            int stoneY = y + 10 + row * (stoneRadius+5);
-            if (stoneX + stoneRadius < x + width && stoneY + stoneRadius < y + height){
+            int stoneX = x + 20 + col * (stoneRadius + 5);
+            int stoneY = y + 10 + row * (stoneRadius + 5);
+            if (stoneX + stoneRadius < x + width && stoneY + stoneRadius < y + height) {
                 g.fillRect(stoneX, stoneY, stoneRadius, stoneRadius);
             }
         }
     }
+
     // helper method to draw stones in the Mancala pit
     private void drawStonesInPit(Graphics g, int x, int y, int width, int height, int stoneCount, Color stoneColor) {
         int stoneRadius = 10;

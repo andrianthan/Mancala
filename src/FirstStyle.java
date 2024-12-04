@@ -35,10 +35,9 @@ public class FirstStyle implements BoardStyle {
         g.drawString("Pit A", width - 50, height - 350);
         g.drawString("Pit B", 20, height - 350);
 
-
         // Draw Mancala B pit
         g.setColor(Color.CYAN);
-        g.fillRect(10, height / 4, 50, height / 2); // Player A's Mancala
+        g.fillRect(10, height / 4, 50, height / 2); // Player B's Mancala
         g.setColor(Color.WHITE);
         String mancalaBText = String.valueOf(view.getModel().getMancalaB());
         g.drawString(mancalaBText, 30, 230);
@@ -47,7 +46,7 @@ public class FirstStyle implements BoardStyle {
 
         // Draw Mancala A pit
         g.setColor(Color.CYAN);
-        g.fillRect(width - 60, height / 4, 50, height / 2); // Player B's Mancala
+        g.fillRect(width - 60, height / 4, 50, height / 2); // Player A's Mancala
         g.setColor(Color.WHITE);
         String mancalaAText = String.valueOf(view.getModel().getMancalaA());
         g.drawString(mancalaAText, width - 40, 230);
@@ -59,27 +58,28 @@ public class FirstStyle implements BoardStyle {
         int pitHeight = 80;
         int gap = 30;
 
-        // Draw Player A's pits
+        // Draw Player B's pits (B6 to B1)
         for (int i = 0; i < 6; i++) {
-            drawPit(g, 80 + i * (pitWidth + gap), 50, pitWidth, pitHeight, stones[i], Color.BLUE);
+            drawPit(g, 80 + i * (pitWidth + gap), 50, pitWidth, pitHeight, stones[12 - i], Color.RED);
         }
 
-        // **Changed here**: Draw Player B's pits
+        // Draw Player A's pits (A1 to A6)
         for (int i = 0; i < 6; i++) {
-            drawPit(g, 80 + i * (pitWidth + gap), height - 110, pitWidth, pitHeight, stones[12 - i], Color.RED);
+            drawPit(g, 80 + i * (pitWidth + gap), height - 110, pitWidth, pitHeight, stones[i], Color.BLUE);
+        }
+
+        // Player B's pit labels & stone count
+        for (int i = 0; i < 6; i++) {
+            g.setColor(Color.WHITE);
+            g.drawString("B" + (6 - i), 90 + i * (pitWidth + gap) + 20, 45);
+            g.drawString(String.valueOf(stones[12 - i]), 90 + i * (pitWidth + gap) + 25, 110);
         }
 
         // Player A's pit labels & stone count
         for (int i = 0; i < 6; i++) {
             g.setColor(Color.WHITE);
-            g.drawString("A" + (6 - i), 90 + i * (pitWidth + gap) + 20, 45);
-            g.drawString(String.valueOf(stones[i]), 90 + i * (pitWidth + gap) + 25, 110);
-        }
-
-        for (int i = 0; i < 6; i++) {
-            g.setColor(Color.WHITE);
-            g.drawString("B" + (i + 1), 90 + i * (pitWidth + gap) + 20, height - 120);
-            g.drawString(String.valueOf(stones[12-i]), 90 + i * (pitWidth + gap) + 25, height - 50);
+            g.drawString("A" + (i + 1), 90 + i * (pitWidth + gap) + 20, height - 120);
+            g.drawString(String.valueOf(stones[i]), 90 + i * (pitWidth + gap) + 25, height - 50);
         }
     }
 

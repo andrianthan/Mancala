@@ -1,241 +1,66 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
-/**
- * @author Karla Nguyen
- * class sview for Mancala game for the players to be able to view the game
- */
 public class MancalaView extends JFrame {
-    private MancalaModel model;
-    private BoardStyle boardStyle;
-    JPanel boardPanel;
-    JButton undoButton;
+    private JButton[][] pitButtons;
+    private JLabel[] mancalaLabels;
+    private JButton undoButton;
+    private MancalaController controller;
 
-    JButton firstStyleButton;
-    JButton secondStyleButton;
-    JPanel stylePanel;
-
-    int width = 800;
-    int height = 500;
-    String message = "";
-    String freeTurn;
-
-    //number of stones in mancala A
-    JLabel mancalaALabel;
-
-    //number of stones in mancala B
-    JLabel mancalaBLabel;
-
-    //status message of the game
-    JLabel statusMessage;
-
-    //number of free turns left
-    JLabel freeTurnMessage;
-
-    /**
-     * Mancala view constructor that boots up the GUI and detects the pits locations
-     * @param model
-     */
-    public MancalaView(MancalaModel model) {
-        this.model = model;
-        setupGUI();
-        // mouse listener to detect clicks on pits
-        boardPanel.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                handlePitClick(e.getX(), e.getY());
-            }
-        });
-    }
-
-    private void handlePitClick(int x, int y) {
-        int pitIndex = getClickedPit(x,y);
-        if(pitIndex != -1) {
-            System.out.println("pitIndex: " + pitIndex);
-        }
-    }
-
-    int getClickedPit(int x, int y) {
-        int pitWidth = 80;
-        int pitHeight = 80;
-        int gap = 30;
-
-        // Player A's pits (Top Row)
-        for (int i = 0; i < 6; i++) {
-            int pitX = 80 + i * (pitWidth + gap);
-            int pitY = 50;
-            if (x >= pitX && x <= pitX + pitWidth && y >= pitY && y <= pitY + pitHeight) {
-                return i; // Indices 0 to 5
-            }
-        }
-
-        for (int i = 0; i < 6; i++) {
-            int pitX = 80 + i * (pitWidth + gap);
-            int pitY = getHeight() - 110;
-            if (x >= pitX && x <= pitX + pitWidth && y >= pitY && y <= pitY + pitHeight) {
-                return 12 - i; // Indices 12 down to 7
-            }
-        }
-        return -1;
-    }
-
-    private void setupGUI() {
-        //set up screen
+    public MancalaView() {
         setTitle("Mancala Game");
-        setSize(width, height);
+        setSize(600, 400);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        //set up panels for user to select board style
-        stylePanel = new JPanel();
-        firstStyleButton = new JButton("First Style");
-        secondStyleButton = new JButton("Second Style");
+        pitButtons = new JButton[2][6];
+        mancalaLabels = new JLabel[2];
+        JPanel boardPanel = new JPanel(new GridLayout(2, 7));
 
-        stylePanel.add(firstStyleButton);
-        stylePanel.add(secondStyleButton);
-        add(stylePanel, BorderLayout.NORTH);
-        stylePanel.setVisible(true);
-        setVisible(true);
-        //Pit buttons and setup
-        boardPanel = new JPanel(){
-            @Override
-            protected void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                if(boardStyle != null) {
-                    boardStyle.drawBoard(MancalaView.this, g);
-                }
-            }
-        };
-        boardPanel.setPreferredSize(new Dimension(800, 500));
+        // Create Player B's row
+        for (int i = 5; i >= 0; i--) {
+            pitButtons[1][i] = new JButton("B" + (i + 1));
+            boardPanel.add(pitButtons[1][i]);
+        }
+        mancalaLabels[1] = new JLabel("Mancala B: 0", SwingConstants.CENTER);
+        boardPanel.add(mancalaLabels[1]);
+
+        // Create Player A's row
+        mancalaLabels[0] = new JLabel("Mancala A: 0", SwingConstants.CENTER);
+        boardPanel.add(mancalaLabels[0]);
+        for (int i = 0; i < 6; i++) {
+            pitButtons[0][i] = new JButton("A" + (i + 1));
+            boardPanel.add(pitButtons[0][i]);
+        }
+
         add(boardPanel, BorderLayout.CENTER);
 
-        JPanel controlPanel = new JPanel();
-        undoButton = new JButton("Undos Left: 3");
-        mancalaALabel = new JLabel(" Mancala A: 0");
-        mancalaBLabel = new JLabel(" Mancala B: 0");
-        freeTurnMessage = new JLabel();
-        statusMessage = new JLabel();
-        Font font = statusMessage.getFont();
-        Font boldFont = new Font(font.getFontName(), font.BOLD, font.getSize());
-        statusMessage.setFont(boldFont);
-        statusMessage.setFont(font);
-        message= "Current Player Turn: Player A ";
-        freeTurn = "Free Turns: 0 | ";
-        setFreeTurnMessage(freeTurn);
-        setStatusMessage(message);
-        controlPanel.add(statusMessage);
-        controlPanel.add(freeTurnMessage);
-        controlPanel.add(mancalaALabel);
-        controlPanel.add(mancalaBLabel);
+        undoButton = new JButton("Undo");
+        add(undoButton, BorderLayout.SOUTH);
 
-        controlPanel.add(undoButton);
-        add(controlPanel, BorderLayout.SOUTH);
+        undoButton.addActionListener(e -> controller.undoMove());
     }
 
-    /**
-     * getter method to get the model
-     * @return
-     */
-    public MancalaModel getModel()
-    {
-        return model;
-    }
+    public void setController(MancalaController controller) {
+        this.controller = controller;
 
-    /**
-     * getter method to get the window height
-     * @return
-     */
-    public int getWindowHeight()
-    {
-        return height;
-    }
-
-    /**
-     * getter method to get the window width
-     * @return
-     */
-    public int getWindowWidth()
-    {
-        return width;
-    }
-
-    /**
-     * method to update board view when player makes a move
-     */
-    public void updateBoard(){
-        mancalaALabel.setText("Mancala A: " + model.getMancalaA() + " | ");
-        mancalaBLabel.setText("Mancala B: " + model.getMancalaB() + " | ");
-        if(model.isFreeTurn())
-        {
-            setFreeTurnMessage("Free Turns: 1 | ");
-
-        }else {
-            setFreeTurnMessage("Free Turns: 0 | ");
-        }
-        if (model.isGameOver())
-        {
-            return;
-        }
-        if(model.isPlayerA())
-        {
-            message = "Current Player Turn: Player A ";
-        }else if(!(model.isPlayerA())) {
-            message = "Current Player Turn: Player B ";
-        }
-        statusMessage.setText(message + " | ");
-        boardPanel.repaint();
-    }
-
-    /**
-     * method to set the board style
-     * @param boardStyle
-     */
-    public void setBoardStyle(BoardStyle boardStyle) {
-        this.boardStyle = boardStyle;
-    }
-
-    /**
-     * method to set the turn status message on the panel
-     * @param message
-     */
-    public void setStatusMessage(String message)
-    {
-        this.message = message;
-        statusMessage.setText(message);
-        updateBoard();
-    }
-
-    /**
-     * method to display how many free turns a player has on the panel
-     * @param message
-     */
-    public void setFreeTurnMessage(String message)
-    {
-        freeTurn = message;
-        freeTurnMessage.setText(freeTurn);
-    }
-
-    /**
-     * method to display when the game is over
-     */
-    public void handleGameOver() {
-        model.collectRemainingStones();
-        updateBoard();
-        int mancalaA = model.getMancalaA();
-        int mancalaB = model.getMancalaB();
-        String winner = mancalaA > mancalaB ? "A" : mancalaA < mancalaB ? "B" : "No one! It's a tie!";
-        setStatusMessage("Game Over! Player " + winner + " wins!");
-    }
-
-    public void updateUndoButton() {
-        if (model.isPlayerA()) {
-            undoButton.setText("Undos Left: " + model.getPlayerAUndoCount());
-        } else {
-            undoButton.setText("Undos Left: " + model.getPlayerBUndoCount());
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 6; j++) {
+                int row = i;
+                int col = j;
+                pitButtons[i][j].addActionListener(e -> controller.makeMove(row, col));
+            }
         }
     }
 
+    public void updateBoard(int[][] pits, int[] mancalas) {
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 6; j++) {
+                pitButtons[i][j].setText((i == 0 ? "A" : "B") + (j + 1) + ": " + pits[i][j]);
+            }
+            mancalaLabels[i].setText("Mancala " + (i == 0 ? "A" : "B") + ": " + mancalas[i]);
+        }
+    }
 }

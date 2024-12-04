@@ -1,264 +1,88 @@
 import java.util.Stack;
 
 public class MancalaModel {
-    private int[] pits;
-    private int mancalaA;
-    private int mancalaB;
-    private int numStonesPerPit;
-    // Tracks whose turn it is
-    private boolean isPlayerA;
-    private int freeTurn = 0;
+    private int[][] pits;
+    private int[] mancalas;
+    private int currentPlayer;
+    private Stack<int[][]> undoStack;
 
-    private int playerAUndoCount = 3;
-    private int playerBUndoCount = 3;
-    private boolean lastPlayerToMoveIsPlayerA;
-
-
-    // Stack to track undo functionality
-
-    private Stack<GameState> history;
-
-    // Stores the style of the board
-    private BoardStyle currentStyle;
-
-
-    public MancalaModel(int numStonesPerPit) {
-        this.numStonesPerPit = numStonesPerPit;
-        // 14 pits, including Mancalas at indices 6 and 13
-        pits = new int[14];
-        mancalaA = 0;
-        mancalaB = 0;
-        isPlayerA = true;
-        history = new Stack<>();
-        initializeBoard();
+    public MancalaModel() {
+        pits = new int[2][6];
+        mancalas = new int[2];
+        currentPlayer = 0; // 0 for Player A, 1 for Player B
+        undoStack = new Stack<>();
+        initializeBoard(3); // Default 3 stones per pit
     }
 
+    public void initializeBoard(int stones) {
+        if (stones < 3 || stones > 4) return;
 
-    private void initializeBoard() {
-        for (int i = 0; i < pits.length; i++) {
-            if (i == 6 || i == 13) {
-                pits[i] = 0;
-            } else {
-                pits[i] = numStonesPerPit;
+        for (int i = 0; i < 2; i++) {
+            for (int j = 0; j < 6; j++) {
+                pits[i][j] = stones;
             }
         }
+        mancalas[0] = 0;
+        mancalas[1] = 0;
     }
 
-    public int getMancalaA() {
-        return pits[6];
+    public int[][] getPits() {
+        return pits;
     }
 
-    public int getMancalaB() {
-        return pits[13];
+    public int[] getMancalas() {
+        return mancalas;
     }
 
-    public int[] getPits() {
-        return pits.clone();
+    public int getCurrentPlayer() {
+        return currentPlayer;
     }
 
-    public boolean isPlayerA() {
-        return isPlayerA;
-    }
+    public void makeMove(int pitIndex) {
+        // Save current state for undo
+        undoStack.push(copyBoard());
 
-    public void togglePlayer() {
-        if (lastPlayerToMoveIsPlayerA != isPlayerA) {
-            // Reset undo count only when the turn switches
-            if (isPlayerA) {
-                playerAUndoCount = 3;
+        int stones = pits[currentPlayer][pitIndex];
+        pits[currentPlayer][pitIndex] = 0;
+
+        int row = currentPlayer;
+        int col = pitIndex;
+
+        while (stones > 0) {
+            col++;
+            if (col == 6) {
+                if (row == currentPlayer) {
+                    mancalas[row]++;
+                    stones--;
+                    if (stones == 0) {
+                        return; // Free turn if last stone is in Mancala
+                    }
+                }
+                row = 1 - row; // Switch row
+                col = -1; // Reset column to -1, will become 0 in next iteration
             } else {
-                playerBUndoCount = 3;
+                pits[row][col]++;
+                stones--;
             }
         }
-        isPlayerA = !isPlayerA;
-        freeTurn = 0;
+
+        currentPlayer = 1 - currentPlayer; // Switch player if no free turn
     }
-
-
-    public void saveState() {
-        history.push(new GameState(pits.clone(), isPlayerA, freeTurn));
-    }
-    public boolean lastPlayerToMoveIsPlayerA() {
-        return lastPlayerToMoveIsPlayerA;
-    }
-
-
 
     public void undo() {
-        if (!history.isEmpty()) {
-            GameState prevState = history.pop();
-            this.pits = prevState.getPits();
-            this.isPlayerA = prevState.isPlayerA();
-            this.freeTurn = prevState.getFreeTurn();
-            if (isPlayerA) {
-                playerAUndoCount--;
-            } else {
-                playerBUndoCount--;
+        if (!undoStack.isEmpty()) {
+            int[][] previousState = undoStack.pop();
+            for (int i = 0; i < 2; i++) {
+                System.arraycopy(previousState[i], 0, pits[i], 0, 6);
             }
         }
     }
 
-
-
-    public void moveStones(int pitIndex) {
-        // Validate pit selection based on the current player
-        if ((isPlayerA && (pitIndex < 0 || pitIndex > 5)) || (!isPlayerA && (pitIndex < 7 || pitIndex > 12))) {
-            throw new IllegalArgumentException("Invalid pit selection!");
+    private int[][] copyBoard() {
+        int[][] copy = new int[2][6];
+        for (int i = 0; i < 2; i++) {
+            System.arraycopy(pits[i], 0, copy[i], 0, 6);
         }
-
-        // Save the current state for undo functionality
-        saveState();
-
-        int stones = pits[pitIndex];
-        pits[pitIndex] = 0;
-        int currentIndex = pitIndex;
-
-        if(isPlayerA)
-        {
-            while (stones > 0) {
-                currentIndex = (currentIndex + 1) % 14;
-                System.out.println("Pit Index : "+ currentIndex);
-
-                // Skip opponent's Mancala
-                if (currentIndex == 13) continue;
-                // Add stones to pits or Mancala
-                pits[currentIndex]++;
-                System.out.println(pits[currentIndex]);
-                stones--;
-                System.out.println(stones);
-
-            }
-        }else {
-            while(stones > 0)
-            {
-               currentIndex = (currentIndex + 1 ) % 14 ;
-               System.out.println("Pit Index : "+ currentIndex);
-               if(currentIndex == 6) continue;
-               pits[currentIndex]++;
-                System.out.println(pits[currentIndex]);
-               stones--;
-               System.out.println(stones);
-            }
-        }
-
-
-        // Handle special rules
-        handleSpecialRules(currentIndex);
-
-        // Track last player to move
-        lastPlayerToMoveIsPlayerA = isPlayerA;
+        return copy;
     }
-
-
-    private void handleSpecialRules(int lastIndex) {
-        // If last stone lands in player's own empty pit, capture stones
-        if (isPlayerA && lastIndex >= 0 && lastIndex < 6 && pits[lastIndex] == 1) {
-            int oppositePitIndex = 12 - lastIndex; // Opposite pit
-            pits[6] += pits[oppositePitIndex] + pits[lastIndex];
-            pits[oppositePitIndex] = 0;
-            pits[lastIndex] = 0;
-        } else if (!isPlayerA && lastIndex >= 7 && lastIndex < 13 && pits[lastIndex] == 1) {
-            int oppositePitIndex = 12 - lastIndex;
-            pits[13] += pits[oppositePitIndex] + pits[lastIndex];
-            pits[oppositePitIndex] = 0;
-            pits[lastIndex] = 0;
-        }
-
-        // If last stone lands in own Mancala, player gets another turn
-        if ((isPlayerA && lastIndex == 6) || (!isPlayerA && lastIndex == 13)) {
-            freeTurn = 1;
-            return;
-        } else {
-            freeTurn = 0;
-        }
-
-        // Toggle turn to the other player
-        togglePlayer();
-    }
-
-    public boolean isGameOver() {
-        boolean playerAPitsEmpty = true;
-        boolean playerBPitsEmpty = true;
-
-        for (int i = 0; i < 6; i++) {
-            if (pits[i] > 0) playerAPitsEmpty = false;
-        }
-        for (int i = 7; i < 13; i++) {
-            if (pits[i] > 0) playerBPitsEmpty = false;
-        }
-
-        return playerAPitsEmpty || playerBPitsEmpty;
-    }
-
-    public boolean isFreeTurn()
-    {
-        if (freeTurn >= 1)
-        {
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    public void collectRemainingStones() {
-        for (int i = 0; i < 6; i++) {
-            pits[6] += pits[i];
-            pits[i] = 0;
-        }
-
-        for (int i = 7; i < 13; i++) {
-            pits[13] += pits[i];
-            pits[i] = 0;
-        }
-    }
-
-    private static class GameState {
-        private final int[] pits;
-        private final boolean isPlayerA;
-        private final int freeTurn;
-
-        public GameState(int[] pits, boolean isPlayerA, int freeTurn) {
-            this.pits = pits;
-            this.isPlayerA = isPlayerA;
-            this.freeTurn = freeTurn;
-        }
-
-        public int[] getPits() {
-            return pits.clone();
-        }
-
-        public boolean isPlayerA() {
-            return isPlayerA;
-        }
-
-        public int getFreeTurn() {
-            return freeTurn;
-        }
-    }
-
-
-    public void setBoardStyle(BoardStyle boardStyle)
-    {
-        currentStyle = boardStyle;
-    }
-
-
-    public int getPlayerAUndoCount() {
-        return playerAUndoCount;
-    }
-
-    public int getPlayerBUndoCount() {
-        return playerBUndoCount;
-    }
-
-
-    public void resetCounters() {
-        freeTurn = 0;
-        if (isPlayerA) {
-            playerAUndoCount = 3;
-        } else {
-            playerBUndoCount = 3;
-        }
-    }
-
-
 }
